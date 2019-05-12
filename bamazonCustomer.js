@@ -10,17 +10,35 @@ const chalk = require('chalk');
 const connection = mysql.createConnection({
     // Host Name
     host: process.env.DB_HOST,
-    // username
+    // Username
     user: process.env.DB_USER,
     // Password
     password: process.env.DB_PASS,
+    // DB Name
     database: process.env.DB_NAME
 });
 
 connection.connect(function (err) {
     if (err) throw err;
-    // runSearch();
-    console.log('I\'m connected!');
-    
+    console.log(chalk.yellow.bgRed('Welcome to the Bamazon Store Database. You are connected via as ID: '+connection.threadId));
+
+    // bamazon main function call
+    bamazon();
 });
 
+function bamazon() {
+    connection.query("SELECT * FROM products",function(err,res) {
+        if(err) throw err;
+
+        table = new Table(
+            {
+                head: ["Product ID".red.bold, "Product Name".red.bold, "Department Name".cyan.bold, "Price".red.bold, "Quantity".red.bold],
+                colWidths: [12, 75, 20, 12, 12],
+            });
+            for (let i = 0; i < res.length; i++) {
+                table.push(
+                    [res[i].id,res[i].product]
+                )
+            }
+    });
+}
