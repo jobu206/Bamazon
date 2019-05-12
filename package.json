@@ -1,0 +1,28 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "Node based CLI App utilizing inquirer to search a db and update quantities based upon user answers.",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jobu206/bamazon.git"
+  },
+  "keywords": [
+    "node",
+    "inquirer",
+    "mysql"
+  ],
+  "author": "Kevin LeRoy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jobu206/bamazon/issues"
+  },
+  "homepage": "https://github.com/jobu206/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^6.3.1",
+    "mysql": "^2.17.1"
+  }
+}
