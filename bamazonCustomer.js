@@ -1,16 +1,20 @@
+require('dotenv').config();
+
 const mysql = require('mysql');
 const inquirer = require('inquirer');
+const table = require('cli-table3');
+const chalk = require('chalk');
 
 
 const connection = mysql.createConnection({
     // Host Name
-    host: 'localhost',
+    host: process.env.DB_HOST,
     // username
-    user: 'root',
+    user: process.env.DB_USER,
 
     // Password
-    password: '',
-    database: 'bamazon'
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
 });
 
 connection.connect(function (err) {
