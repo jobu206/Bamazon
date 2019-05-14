@@ -3,8 +3,8 @@ require('dotenv').config();
 // required dependencies
 const mysql = require('mysql');
 const inquirer = require('inquirer');
-const table = require('cli-table3');
-const chalk = require('chalk');
+const Table = require('cli-table3');
+const colors = require('colors');
 
 // connection script
 const connection = mysql.createConnection({
@@ -20,55 +20,52 @@ const connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log(chalk.green('Welcome to the Bamazon Store Database. You are connected to Bamazon as ID: ' + connection.threadId));
+    console.log(colors.green('Welcome to the Bamazon Store Database. You are connected to Bamazon as ID: ' + connection.threadId));
 
     // bamazon main function call
-    showProduct();
+    bamazon();
 });
 
-function showProduct() {
-    connection.query('SELECT `item_id`, `product_name`,`price` FROM products', function name(err, res) {
+function bamazon() {
+    // connection query
+    connection.query('SELECT * FROM products', function(err,res){
         if (err) throw err;
-        console.log(res);
-        buyProduct();
-    });
-}
 
-function buyProduct() {
-    inquirer
-        .prompt([
+        // cli-table display code w/ color
+        let table = new Table(
             {
-                name: 'item',
+                head: ['Product ID'.cyan.bold,'Product Name'.cyan.bold,'Department Name'.cyan.bold,'Price'.cyan.bold,'Quantity'.cyan.bold],
+                colWidths: [12,75,20,12,12]
+            }
+        );
+
+        // set & style table headings and loop through inventory
+        for (let i = 0; i < res.length; i++) {
+            table.push(
+                [res[i].item_id, res[i].product_name, res[i].department_name, parseFloat(res[i].price).toFixed(2), res[i].stock_quantity]
+            );
+        }
+        console.log(table.toString());
+
+        // Prompt User Input
+        inquirer.prompt([
+            {
+                name: 'id',
                 type: 'number',
-                message: 'Enter the ID of the product you wish to purchase.'
+                message: 'Please enter the Product ID of the item that you would like to buy?'.yellow
             },
             {
-                name: 'units',
+                name: 'quantity',
                 type: 'number',
-                message: 'How many units of the product would you like to purchase?'
+                message: 'How many units would you like to buy?'
             }
         ])
-        .then(function (answer) {
-            console.log('answer', answer);
-            verifyInventory(answer);
-        });
-}
-function verifyInventory(answer) {
-    connection.query('SELECT `stock_quantity`,`price` FROM products WHERE ?',
-        {
-            item_id: answer.item,
-        },
-        function (err, res) {
-            if (err) throw err;
-            console.log(res);
-            if (res[0].stock_quantity < answer.this) {
-                console.log(chalk.red('I\'m sorry, but we do not have enough inventory to cover your order.'));
-                connection.end();
-            } else {
-                // updateDB(answer,res);
-                // connection.end();
-                console.log('this is working!');
-            }
-        }
-    );
+        .then(function(cart) {
+            let qty = cart.qty;
+            let itemId = cart.id;
+
+            // connection query to verify inventory.
+            connection.query('SELECT * FROM PRODUCTS WHERE id = ' + itemId)
+        })
+    })
 }
