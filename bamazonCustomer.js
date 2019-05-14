@@ -20,45 +20,55 @@ const connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log(chalk.yellow.bgRed('Welcome to the Bamazon Store Database. You are connected via as ID: '+connection.threadId));
+    console.log(chalk.green('Welcome to the Bamazon Store Database. You are connected to Bamazon as ID: ' + connection.threadId));
 
     // bamazon main function call
-    bamazon();
+    showProduct();
 });
 
-function bamazon() {
-    connection.query("SELECT * FROM products",function(err,res) {
-        if(err) throw err;
-
-        table = new Table(
-            {
-                head: ["Product ID".red.bold, "Product Name".red.bold, "Department Name".cyan.bold, "Price".red.bold, "Quantity".red.bold],
-                colWidths: [12, 75, 20, 12, 12],
-            });
-            // 
-            for (let i = 0; i < res.length; i++) {
-                table.push(
-                    [res[i].item_id,res[i].product_name,res[i].department_name,parseFloat(res[i].price).toFixed(2),res[i].stock_quantity]
-                )
-            }
-            console.log(table.toString);
-
-            // prompt shopper for input
-            inquirer.prompt([
-                {
-                    type: "number",
-                    message: "Please enter the Product ID of the item that you would like to buy.".green,
-                    name: "id"
-                },
-                {
-                    type: "number",
-                    message: "How many would you like to buy?",
-                    name: "quantity"
-                },
-            ])
-            // Ordering function
-            .then(function (cart) {
-                
-            })
+function showProduct() {
+    connection.query('SELECT `item_id`, `product_name`,`price` FROM products', function name(err, res) {
+        if (err) throw err;
+        console.log(res);
+        buyProduct();
     });
+}
+
+function buyProduct() {
+    inquirer
+        .prompt([
+            {
+                name: 'item',
+                type: 'number',
+                message: 'Enter the ID of the product you wish to purchase.'
+            },
+            {
+                name: 'units',
+                type: 'number',
+                message: 'How many units of the product would you like to purchase?'
+            }
+        ])
+        .then(function (answer) {
+            console.log('answer', answer);
+            verifyInventory(answer);
+        });
+}
+function verifyInventory(answer) {
+    connection.query('SELECT `stock_quantity`,`price` FROM products WHERE ?',
+        {
+            item_id: answer.item,
+        },
+        function (err, res) {
+            if (err) throw err;
+            console.log(res);
+            if (res[0].stock_quantity < answer.this) {
+                console.log(chalk.red('I\'m sorry, but we do not have enough inventory to cover your order.'));
+                connection.end();
+            } else {
+                // updateDB(answer,res);
+                // connection.end();
+                console.log('this is working!');
+            }
+        }
+    );
 }
