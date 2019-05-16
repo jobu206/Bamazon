@@ -4,7 +4,7 @@ Welcome to Bamazon an Amazon-like storefront! Only you can't buy real product. T
 ## Code Samples
 
 ### Config
-![Screenshot](assets/images/config.png)
+![Screenshot](../assets/images/config.png)
 
 ### Display
 ![Screenshot](assets/images/displayFunction.png)
