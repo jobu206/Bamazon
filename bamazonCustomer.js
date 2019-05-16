@@ -14,13 +14,13 @@ const connection = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-connection.connect(function (err) {
-    if (err) throw err;
-    console.log(colors.yellow("Welcome to Bamazon! You are now connected to the Store as id " + connection.threadId));
-});
+// connection.connect(function (err) {
+//     if (err) throw err;
+//     console.log(colors.yellow("Welcome to Bamazon! You are now connected to the Store as id " + connection.threadId));
+// });
 
 function displayProducts() {
-    console.log(colors.green("Showing all products available."));
+    console.log("\nWelcome to Bamazon!".yellow.underline);
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         // Cli-Table display code with Color
@@ -66,7 +66,7 @@ function checkInvetory(answer) {
         function(err, res) {
             if (err) throw err;
             if (res[0].stock_qty < answer.qty) {
-                console.log(colors.red("We're sorry, but we are unable to fulfill your order."));
+                console.log("We're sorry, but we are unable to fulfill your order.".red);
                 connection.end();
             } else {
                 updateDB(answer, res);
@@ -89,7 +89,7 @@ function updateDB(answer, res) {
         if (err) throw err;
         let num = res[0].price * answer.qty;
         let n = num.toFixed(2);
-        console.log(colors.yellow("Your total price is: " + n));
+        console.log("Your total price is: " + '$'.yellow + n.yellow);
     })
     displayProducts();
 }
